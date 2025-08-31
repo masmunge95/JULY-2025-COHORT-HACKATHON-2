@@ -18,37 +18,36 @@ def _check_and_log_usage(
     supabase: Client, current_user: User, topic: str, activity_type: str
 ):
     """
-    Checks user's usage against the free tier limit.
-    If the user is within the limit, it logs the new activity.
+    Checks user's usage against the free tier limit by calling a database function
+    for atomicity. If the user is within the limit, it logs the new activity.
     If the limit is reached, it raises an HTTPException.
-    Premium users are exempt from this check.
+    Premium users are exempt from this check but their usage is still logged.
     """
-    if current_user.is_premium:
-        return  # Premium users have unlimited access
-
-    # 1. Check current usage
-    count_res = (
-        supabase.table("history")
-        .select("id", count="exact")
-        .eq("user_id", current_user.id)
-        .eq("activity_type", activity_type)
-        .execute()
-    )
-
-    if count_res.count >= FREE_TIER_LIMIT:
-        raise HTTPException(
-            status_code=status.HTTP_402_PAYMENT_REQUIRED,
-            detail=f"You have reached the limit for free {activity_type} generations. Please upgrade to premium.",
-        )
-
-    # 2. Log the new activity *before* the expensive AI call to be more robust
-    supabase.table("history").insert(
-        {
-            "user_id": str(current_user.id),
-            "topic": topic,
-            "activity_type": activity_type,
+    # This logic is now handled atomically by a database function
+    # to prevent race conditions.
+    try:
+        # Note: You need to create the `can_and_log_activity` function in your
+        # Supabase SQL editor. See the provided SQL snippet for its definition.
+        params = {
+            "p_user_id": str(current_user.id),
+            "p_activity_type": activity_type,
+            "p_topic": topic,
+            "p_limit": FREE_TIER_LIMIT,
         }
-    ).execute()
+        can_perform_activity = supabase.rpc("can_and_log_activity", params).execute().data
+
+        if not can_perform_activity:
+            raise HTTPException(
+                status_code=status.HTTP_402_PAYMENT_REQUIRED,
+                detail=f"You have reached the limit for free {activity_type} generations. Please upgrade to premium.",
+            )
+    except Exception as e:
+        # A more specific exception catch would be better (e.g. PostgrestError).
+        # logger.error(f"Error during usage check for user {current_user.id}: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Could not verify usage limits.",
+        )
 
 
 @router.post("/generate_quiz", response_model=QuizResponse)
