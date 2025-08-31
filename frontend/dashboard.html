@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Educational Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* For Flashcard flip effect */
+        .flashcard-inner { transform-style: preserve-3d; transition: transform 0.6s; }
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-front, .flashcard-back { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+        .flashcard-back { transform: rotateY(180deg); }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
+            <div>
+                <span id="user-email" class="text-gray-600 mr-4"></span>
+                <button id="logout-button" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Main Content Area -->
+        <div class="px-4 py-6 sm:px-0">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- Left Column: Controls -->
+                <div class="lg:col-span-1 space-y-6">
+                    <!-- Premium Upgrade Section -->
+                    <div id="premium-section" class="bg-white p-6 rounded-lg shadow hidden">
+                        <h3 class="text-lg font-medium text-gray-900">Go Premium!</h3>
+                        <p class="mt-2 text-sm text-gray-600">Unlock unlimited quizzes and flashcards.</p>
+                        <button id="upgrade-button" class="mt-4 w-full bg-yellow-500 text-white font-bold py-2 px-4 rounded hover:bg-yellow-600">
+                            Upgrade for $9.99
+                        </button>
+                    </div>
+
+                    <!-- Content Generation -->
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-lg font-medium text-gray-900">Generate Content</h3>
+                        <div class="mt-4">
+                            <label for="topic-input" class="block text-sm font-medium text-gray-700">Topic</label>
+                            <input type="text" id="topic-input" placeholder="e.g., Photosynthesis"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div class="mt-4 flex space-x-4">
+                            <button id="generate-quiz-btn" class="flex-1 bg-indigo-600 text-white font-bold py-2 px-4 rounded hover:bg-indigo-700">
+                                New Quiz
+                            </button>
+                            <button id="generate-flashcards-btn" class="flex-1 bg-green-600 text-white font-bold py-2 px-4 rounded hover:bg-green-700">
+                                New Flashcards
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Dashboard Info -->
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-lg font-medium text-gray-900">My Progress</h3>
+                        <div id="history-container" class="mt-4 space-y-3">
+                            <h4 class="font-semibold">Recent Activity</h4>
+                            <div id="history-list" class="text-sm text-gray-600">Loading...</div>
+                        </div>
+                        <div id="milestones-container" class="mt-6 space-y-3">
+                            <h4 class="font-semibold">Milestones</h4>
+                            <div id="milestones-list" class="text-sm text-gray-600">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Content Display -->
+                <div class="lg:col-span-2">
+                    <div id="content-display" class="bg-white p-6 rounded-lg shadow min-h-[400px]">
+                        <div id="welcome-message" class="text-center text-gray-500">
+                            <h2 class="text-xl font-semibold">Welcome!</h2>
+                            <p>Enter a topic and generate a quiz or flashcards to get started.</p>
+                        </div>
+
+                        <!-- Loading Spinner -->
+                        <div id="content-loading" class="hidden text-center py-16">
+                            <svg class="animate-spin h-10 w-10 text-indigo-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <p class="mt-4 text-gray-600">Generating content... this may take a moment.</p>
+                        </div>
+
+                        <!-- Error Message -->
+                        <div id="content-error" class="hidden text-center py-16 bg-red-50 border border-red-200 rounded-md p-4">
+                            <h3 class="text-lg font-semibold text-red-800">An Error Occurred</h3>
+                            <p id="error-message-text" class="mt-2 text-red-700"></p>
+                            <button onclick="document.getElementById('content-error').classList.add('hidden')" class="mt-4 text-sm text-red-600 hover:underline">Dismiss</button>
+                        </div>
+
+                        <!-- Quiz View -->
+                        <div id="quiz-view" class="hidden">
+                            <h2 id="quiz-topic" class="text-2xl font-bold mb-4"></h2>
+                            <div id="quiz-question-container">
+                                <!-- Question will be injected here -->
+                            </div>
+                            <div id="quiz-feedback" class="mt-4 text-lg font-medium"></div>
+                            <button id="quiz-next-btn" class="hidden mt-4 bg-indigo-600 text-white font-bold py-2 px-4 rounded hover:bg-indigo-700">
+                                Next Question
+                            </button>
+                            <div id="quiz-results" class="hidden text-center">
+                                <h3 class="text-xl font-semibold">Quiz Complete!</h3>
+                                <p id="quiz-score" class="text-2xl mt-2"></p>
+                                <button id="quiz-restart-btn" class="mt-4 bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded hover:bg-gray-300">
+                                    Try another topic
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Flashcards View -->
+                        <div id="flashcards-view" class="hidden">
+                            <h2 id="flashcards-topic" class="text-2xl font-bold mb-4"></h2>
+                            <div id="flashcards-container" class="space-y-4">
+                                <!-- Flashcards will be injected here -->
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300">
+        <p id="toast-message"></p>
+    </div>
+
+    <script src="./js/auth.js"></script>
+    <script src="./js/api.js"></script>
+    <script src="./js/ui.js"></script>
+    <script src="./js/main.js"></script>
+</body>
+</html>
