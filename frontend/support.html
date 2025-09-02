@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support | EduAssist</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {}
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-white dark:bg-gray-950 text-black dark:text-gray-100 min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-white dark:bg-gray-800 shadow-md p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="dashboard.html" class="text-2xl font-bold text-red-600 dark:text-red-500">EduAssist</a>
+            <div class="flex items-center space-x-4">
+                <a href="support.html" class="text-gray-600 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-500 transition-colors">Support</a>
+                <button id="theme-toggle" class="p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300">
+                    <span id="theme-toggle-icon"><!-- SVG icon here --></span>
+                </button>
+                <span id="user-email" class="hidden md:inline text-gray-600 dark:text-gray-300"></span>
+                <a href="profile.html" id="profile-link">
+                    <img id="user-avatar" src="" alt="User Avatar" class="w-10 h-10 rounded-full border-2 border-red-500">
+                </a>
+                <button id="logout-button" class="font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline shadow-md hover:shadow-lg transition-all duration-300 bg-red-600 hover:bg-red-700 text-white dark:bg-red-500 dark:hover:bg-red-600">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-12">
+        <h1 class="text-4xl font-bold text-center mb-4">Support Center</h1>
+        <p class="text-lg text-gray-600 dark:text-gray-300 text-center mb-12">How can we help you?</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <!-- Contact Form -->
+            <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-6">Send us a Message</h2>
+                <div id="support-success-alert" class="hidden bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded-r-lg" role="alert">
+                    <p>Your message has been sent! We'll get back to you shortly.</p>
+                </div>
+                <form id="support-form" class="space-y-6">
+                    <div>
+                        <label for="support-name" class="block text-sm font-bold mb-2">Your Name</label>
+                        <input type="text" id="support-name" class="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors duration-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-black dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300" required>
+                    </div>
+                    <div>
+                        <label for="support-email" class="block text-sm font-bold mb-2">Your Email</label>
+                        <input type="email" id="support-email" class="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors duration-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-black dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300" required>
+                    </div>
+                    <div>
+                        <label for="support-message" class="block text-sm font-bold mb-2">Message</label>
+                        <textarea id="support-message" rows="5" class="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors duration-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-black dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300" required></textarea>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <button type="button" id="exit-support-button" class="font-bold py-3 px-6 rounded-lg focus:outline-none focus:shadow-outline shadow-md hover:shadow-lg transition-all duration-300 bg-gray-600 hover:bg-gray-700 text-white dark:bg-gray-500 dark:hover:bg-gray-600">Back to Dashboard</button>
+                        <button type="submit" class="font-bold py-3 px-6 rounded-lg focus:outline-none focus:shadow-outline shadow-md hover:shadow-lg transition-all duration-300 bg-red-600 hover:bg-red-700 text-white dark:bg-red-500 dark:hover:bg-red-600">Send Message</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- FAQs -->
+            <div class="space-y-6">
+                <h2 class="text-2xl font-semibold mb-6">Frequently Asked Questions</h2>
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+                    <h3 class="font-bold text-lg mb-2">How do I upgrade my account?</h3>
+                    <p class="text-gray-600 dark:text-gray-400">You can upgrade your account by visiting the <a href="upgrade.html" class="text-red-500 hover:underline">Upgrade page</a> and choosing a plan that suits you.</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+                    <h3 class="font-bold text-lg mb-2">What are the limitations of the free plan?</h3>
+                    <p class="text-gray-600 dark:text-gray-400">Free users are limited to 10 tasks per month and 3 tasks per day. Access is restricted to basic quizzes, flashcards, and explanations in Math, Science, and English.</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+                    <h3 class="font-bold text-lg mb-2">How do I change my password?</h3>
+                    <p class="text-gray-600 dark:text-gray-400">You can change your password on your <a href="profile.html" class="text-red-500 hover:underline">Profile page</a>.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Exit Confirmation Modal -->
+    <div id="exit-confirm-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 transition-opacity duration-300 ease-out">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8 max-w-sm w-full transform transition-all duration-300 ease-out scale-95 opacity-0" id="exit-confirm-dialog">
+            <h3 class="text-2xl font-bold text-center mb-4">Leave this page?</h3>
+            <p class="text-gray-600 dark:text-gray-400 text-center mb-6">Your message will not be sent. Are you sure you want to go back?</p>
+            <div class="flex justify-center gap-4">
+                <button id="cancel-exit-button" class="font-bold py-2 px-6 rounded-lg focus:outline-none focus:shadow-outline shadow-md hover:shadow-lg transition-all duration-300 bg-gray-300 hover:bg-gray-400 text-gray-800 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white">
+                    Stay
+                </button>
+                <button id="confirm-exit-button" class="font-bold py-2 px-6 rounded-lg focus:outline-none focus:shadow-outline shadow-md hover:shadow-lg transition-all duration-300 bg-red-600 hover:bg-red-700 text-white dark:bg-red-500 dark:hover:bg-red-600">
+                    Go Back
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/theme.js"></script>
+    <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/support.js"></script>
+</body>
+</html>

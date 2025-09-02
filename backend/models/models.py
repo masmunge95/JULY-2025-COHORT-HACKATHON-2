@@ -26,10 +26,20 @@ class QuizResponse(BaseModel):
 
 
 class Flashcard(BaseModel):
-    front: str
-    back: str
+    question: str
+    answer: str
 
 
 class FlashcardResponse(BaseModel):
     topic: str
     flashcards: List[Flashcard]
+
+
+class ExplanationResponse(BaseModel):
+    topic: str
+    explanation: str
+
+
+class DiscussionResponse(BaseModel):
+    topic: str
+    discussion_points: List[str]

@@ -1,108 +1,144 @@
-/**
- * IMPORTANT:
- * You must replace these placeholder values with your actual Supabase project URL and Anon Key.
- * You can find these in your Supabase project's "API" settings.
- * The 'anon' key is safe to use in client-side code.
- */
-const SUPABASE_URL = 'https://ssmddcoxoocqitjjlnfs.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNzbWRkY294b29jcWl0ampsbmZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY2MzAyMDUsImV4cCI6MjA3MjIwNjIwNX0.bSDGrMrYPSN0R_QoY0QehNENYZjs7jU_uueScvP_MlQ';
+import { supabase } from './supabaseClient.js';
 
-// Initialize the Supabase client
-if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-    console.error("Supabase URL and Anon Key are required. Make sure to update them in auth.js");
-}
-// The 'supabase' object is globally available from the Supabase CDN script.
-// We need to use `window.supabase` to refer to the global object to avoid
-// a "temporal dead zone" error with the `const supabase` declaration.
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const modal = document.getElementById('auth-modal');
+const overlay = document.getElementById('auth-modal-overlay');
+const closeModalBtn = document.getElementById('close-modal-btn');
 
-// --- Get DOM Elements ---
-const authForm = document.getElementById('auth-form');
-const loginButton = document.getElementById('login-button');
-const signupButton = document.getElementById('signup-button');
-const authError = document.getElementById('auth-error');
-const loadingSpinner = document.getElementById('loading');
-const authView = document.getElementById('auth-view');
+const loginTab = document.getElementById('login-tab');
+const signupTab = document.getElementById('signup-tab');
+const loginForm = document.getElementById('login-form');
+const signupForm = document.getElementById('signup-form');
 
-// --- Helper Functions ---
+const loginBtnMain = document.getElementById('login-btn-main');
+const signupBtnMain = document.getElementById('signup-btn-main');
+const getStartedBtn = document.getElementById('get-started-btn');
 
-/**
- * Toggles the visibility of the loading spinner and the auth form.
- * @param {boolean} isLoading - Whether to show the loading spinner.
- */
-function setLoading(isLoading) {
-    if (isLoading) {
-        loadingSpinner.classList.remove('hidden');
-        authView.classList.add('hidden');
-    } else {
-        loadingSpinner.classList.add('hidden');
-        authView.classList.remove('hidden');
+const authErrorDiv = document.getElementById('auth-error');
+const authErrorMessage = document.getElementById('auth-error-message');
+
+const avatarSeedInput = document.getElementById('signup-avatar-seed');
+const avatarPreview = document.getElementById('avatar-preview');
+
+const showModal = () => modal.classList.replace('hidden', 'flex');
+const hideModal = () => modal.classList.replace('flex', 'hidden');
+
+const showError = (message) => {
+    authErrorMessage.textContent = message;
+    authErrorDiv.classList.remove('hidden');
+};
+
+const hideError = () => {
+    authErrorDiv.classList.add('hidden');
+};
+
+const switchToLogin = () => {
+    hideError();
+    loginTab.classList.add('border-red-500', 'text-red-500');
+    loginTab.classList.remove('text-gray-500', 'dark:text-gray-400');
+    signupTab.classList.remove('border-red-500', 'text-red-500');
+    signupTab.classList.add('text-gray-500', 'dark:text-gray-400');
+    loginForm.classList.remove('hidden');
+    signupForm.classList.add('hidden');
+};
+
+const switchToSignup = () => {
+    hideError();
+    signupTab.classList.add('border-red-500', 'text-red-500');
+    signupTab.classList.remove('text-gray-500', 'dark:text-gray-400');
+    loginTab.classList.remove('border-red-500', 'text-red-500');
+    loginTab.classList.add('text-gray-500', 'dark:text-gray-400');
+    signupForm.classList.remove('hidden');
+    loginForm.classList.add('hidden');
+};
+
+// Event Listeners
+[loginBtnMain, signupBtnMain, getStartedBtn, overlay, closeModalBtn].forEach(el => {
+    if (el) {
+        el.addEventListener('click', (e) => {
+            if (e.currentTarget === loginBtnMain) {
+                switchToLogin();
+                showModal();
+            } else if (e.currentTarget === signupBtnMain || e.currentTarget === getStartedBtn) {
+                switchToSignup();
+                showModal();
+            } else if (e.currentTarget === overlay || e.currentTarget === closeModalBtn) {
+                hideModal();
+            }
+        });
     }
-}
+});
 
-/**
- * Displays an error message in the auth form.
- * @param {string} message - The error message to display.
- */
-function showError(message) {
-    authError.textContent = message;
-    authError.classList.remove('hidden');
-}
+loginTab.addEventListener('click', switchToLogin);
+signupTab.addEventListener('click', switchToSignup);
 
-// --- Event Handlers ---
+avatarSeedInput.addEventListener('input', (e) => {
+    const seed = e.target.value || 'default';
+    avatarPreview.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(seed)}`;
+});
 
-loginButton.addEventListener('click', async (e) => {
+// Handle Login
+loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    setLoading(true);
-    showError(''); // Clear previous errors
-
-    const email = authForm.email.value;
-    const password = authForm.password.value;
+    hideError();
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
 
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
         showError(error.message);
-        setLoading(false);
+    } else {
+        window.location.href = 'dashboard.html';
+    }
+});
+
+// Handle Signup
+signupForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideError();
+
+    const firstName = document.getElementById('signup-firstname').value;
+    const lastName = document.getElementById('signup-lastname').value;
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+    const avatarSeed = document.getElementById('signup-avatar-seed').value;
+
+    if (password.length < 6) {
+        showError("Password must be at least 6 characters long.");
+        return;
+    }
+    if (!firstName || !lastName) {
+        showError("First and last name are required.");
         return;
     }
 
-    // On success, Supabase handles the session. The checkUserSession will redirect.
-    // Or you can redirect manually here.
-    window.location.href = '/dashboard.html'; // <-- CHANGE TO YOUR PROTECTED PAGE
-});
+    const { data: { user }, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+    });
 
-signupButton.addEventListener('click', async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    showError(''); // Clear previous errors
-
-    const email = authForm.email.value;
-    const password = authForm.password.value;
-
-    const { data, error } = await supabase.auth.signUp({ email, password });
-
-    if (error) {
-        showError(error.message);
-    } else {
-        // By default, Supabase sends a confirmation email.
-        alert('Signup successful! Please check your email to verify your account.');
+    if (signUpError) {
+        showError(signUpError.message);
+        return;
     }
-    
-    setLoading(false);
-});
 
-/**
- * Checks if a user session exists and redirects to the dashboard if it does.
- * This function is called from index.html.
- */
-async function checkUserSession() {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-        console.log('Active session found. Redirecting...');
-        window.location.href = '/dashboard.html'; // <-- CHANGE TO YOUR PROTECTED PAGE
+    if (user) {
+        const avatar_url = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(avatarSeed || email)}`;
+        
+        const { error: profileError } = await supabase
+            .from('user_profiles')
+            .insert({
+                id: user.id,
+                first_name: firstName,
+                last_name: lastName,
+                avatar_url: avatar_url
+            });
+
+        if (profileError) {
+            showError(`Account created, but failed to create profile: ${profileError.message}`);
+        } else {
+            alert('Signup successful! Please check your email to verify your account.');
+            switchToLogin();
+        }
     }
-}
-
-// Check for an active session as soon as the script loads
-checkUserSession();
+});

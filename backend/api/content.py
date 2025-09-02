@@ -1,9 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from supabase import Client
+from supabase import Client, PostgrestAPIError
 
 from ..core.security import get_current_user
 from ..core.dependencies import get_supabase_client
-from ..models.models import User, TopicRequest, QuizResponse, FlashcardResponse
+from ..models.models import (
+    User,
+    TopicRequest,
+    QuizResponse,
+    FlashcardResponse,
+    ExplanationResponse,
+    DiscussionResponse,
+)
 from ..services import ai_service
 
 router = APIRouter()
@@ -12,6 +19,8 @@ router = APIRouter()
 FREE_TIER_LIMIT = 5
 ACTIVITY_QUIZ = "quiz"
 ACTIVITY_FLASHCARD = "flashcard"
+ACTIVITY_EXPLANATION = "explanation"
+ACTIVITY_DISCUSSION = "discussion"
 
 
 def _check_and_log_usage(
@@ -41,12 +50,19 @@ def _check_and_log_usage(
                 status_code=status.HTTP_402_PAYMENT_REQUIRED,
                 detail=f"You have reached the limit for free {activity_type} generations. Please upgrade to premium.",
             )
+    except PostgrestAPIError as e:
+        # Handle specific database errors from Supabase/PostgREST
+        # logger.error(f"Database error during usage check for user {current_user.id}: {e.message}")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Could not verify usage limits due to a database error.",
+        )
     except Exception as e:
-        # A more specific exception catch would be better (e.g. PostgrestError).
-        # logger.error(f"Error during usage check for user {current_user.id}: {e}")
+        # Catch any other unexpected errors
+        # logger.error(f"Unexpected error during usage check for user {current_user.id}: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Could not verify usage limits.",
+            detail="An unexpected error occurred while verifying usage limits.",
         )
 
 
@@ -79,4 +95,38 @@ async def generate_flashcards(
     _check_and_log_usage(supabase, current_user, request.topic, ACTIVITY_FLASHCARD)
 
     flashcard_data = await ai_service.generate_flashcards_from_topic(request.topic)
-    return FlashcardResponse(**flashcard_data)
+    return FlashcardResponse(topic=request.topic, **flashcard_data)
+
+
+@router.post("/generate_explanation", response_model=ExplanationResponse)
+async def generate_explanation(
+    request: TopicRequest,
+    current_user: User = Depends(get_current_user),
+    supabase: Client = Depends(get_supabase_client),
+):
+    """
+    Generates a detailed explanation for a given topic.
+    Free users have a limit.
+    """
+    _check_and_log_usage(supabase, current_user, request.topic, ACTIVITY_EXPLANATION)
+
+    explanation_text = await ai_service.generate_explanation_from_topic(
+        request.topic
+    )
+    return ExplanationResponse(topic=request.topic, explanation=explanation_text)
+
+
+@router.post("/generate_discussion", response_model=DiscussionResponse)
+async def generate_discussion_points(
+    request: TopicRequest,
+    current_user: User = Depends(get_current_user),
+    supabase: Client = Depends(get_supabase_client),
+):
+    """
+    Generates discussion points for a given topic.
+    Free users have a limit.
+    """
+    _check_and_log_usage(supabase, current_user, request.topic, ACTIVITY_DISCUSSION)
+
+    discussion_data = await ai_service.generate_discussion_from_topic(request.topic)
+    return DiscussionResponse(topic=request.topic, **discussion_data)

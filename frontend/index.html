@@ -3,69 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Educational Assistant</title>
+    <title>EduAssist | Your Personal AI Learning Companion</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {}
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
+<body class="bg-white dark:bg-gray-950 text-black dark:text-gray-100">
 
-    <div class="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
-        <div id="auth-view">
-            <h2 class="text-2xl font-bold text-center text-gray-800">Welcome!</h2>
-            <p class="text-center text-gray-600">Sign in or create an account to continue</p>
+    <!-- Header -->
+    <header class="p-4 flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-red-600 dark:text-red-500">EduAssist</h1>
+        <div>
+            <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 mr-2">
+                <svg class="w-5 h-5 block dark:hidden" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                <svg class="w-5 h-5 hidden dark:block" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 5.05A1 1 0 003.636 6.464l.707.707a1 1 0 001.414-1.414l-.707-.707zM3 11a1 1 0 100-2H2a1 1 0 100 2h1zM13.536 14.95l.707.707a1 1 0 01-1.414 1.414l-.707-.707a1 1 0 011.414-1.414z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+            </button>
+            <button id="login-btn-main" class="bg-transparent text-black dark:text-white font-semibold py-2 px-4 border border-gray-400 dark:border-gray-600 rounded-lg shadow-sm hover:bg-gray-100 dark:hover:bg-gray-800 mr-2">Login</button>
+            <button id="signup-btn-main" class="font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline shadow-md hover:shadow-lg transition-all duration-300 bg-red-600 hover:bg-red-700 text-white dark:bg-red-500 dark:hover:bg-red-600">Sign Up</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-16 text-center">
+        <h2 class="text-4xl md:text-5xl font-extrabold leading-tight mb-4">Stuck on homework? Don't just get the answer. <span class="text-red-600 dark:text-red-500">Understand it.</span></h2>
+        <p class="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">EduAssist is your AI-powered sidekick, turning confusion into confidence. Stop wrestling with problems and start mastering concepts, one witty explanation at a time.</p>
+        <button id="get-started-btn" class="font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:shadow-xl transition-transform transform hover:scale-105 bg-red-600 hover:bg-red-700 text-white dark:bg-red-500 dark:hover:bg-red-600">
+            Start Learning for Free
+        </button>
+    </main>
+
+    <!-- Features Section -->
+    <section class="py-20 bg-gray-50 dark:bg-gray-900">
+        <div class="container mx-auto px-6">
+            <h3 class="text-3xl font-bold text-center mb-12">Why you'll love EduAssist ✨</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg text-center">
+                    <h4 class="text-xl font-bold mb-2">AI-Powered Tutoring</h4>
+                    <p class="text-gray-600 dark:text-gray-400">Get step-by-step explanations for complex problems in Math, Science, and English.</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg text-center">
+                    <h4 class="text-xl font-bold mb-2">Interactive Quizzes</h4>
+                    <p class="text-gray-600 dark:text-gray-400">Test your knowledge with quizzes that adapt to your learning level.</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg text-center">
+                    <h4 class="text-xl font-bold mb-2">Personalized Flashcards</h4>
+                    <p class="text-gray-600 dark:text-gray-400">Create and study flashcards to memorize key concepts and formulas.</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg text-center">
+                    <h4 class="text-xl font-bold mb-2">Group Discussions</h4>
+                    <p class="text-gray-600 dark:text-gray-400">Collaborate with peers, ask questions, and solve problems together.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="hidden fixed inset-0 z-50 items-center justify-center">
+        <div id="auth-modal-overlay" class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
+        <div class="relative w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
+            <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 dark:hover:text-white">&times;</button>
             
-            <!-- Auth Form -->
-            <form id="auth-form" class="mt-8 space-y-6">
-                <div>
-                    <label for="email" class="sr-only">Email address</label>
-                    <input id="email" name="email" type="email" autocomplete="email" required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                        placeholder="Email address">
-                </div>
-                <div>
-                    <label for="password" class="sr-only">Password</label>
-                    <input id="password" name="password" type="password" autocomplete="current-password" required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                        placeholder="Password">
-                </div>
+            <!-- Tabs -->
+            <div class="flex border-b border-gray-200 dark:border-gray-700 mb-6">
+                <button id="login-tab" class="flex-1 py-2 text-center font-semibold border-b-2 border-red-500 text-red-500">Login</button>
+                <button id="signup-tab" class="flex-1 py-2 text-center font-semibold text-gray-500 dark:text-gray-400">Sign Up</button>
+            </div>
 
-                <div class="flex items-center justify-end">
-                    <div class="text-sm">
-                        <a href="forgot-password.html" class="font-medium text-indigo-600 hover:text-indigo-500">
-                            Forgot your password?
-                        </a>
+            <div id="auth-error" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-4" role="alert">
+                <strong class="font-bold">Error:</strong>
+                <span class="block sm:inline" id="auth-error-message"></span>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form">
+                <div class="mb-4">
+                    <label for="login-email" class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">Email</label>
+                    <input class="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors duration-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-black dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300" id="login-email" type="email" placeholder="you@example.com" required>
+                </div>
+                <div class="mb-6">
+                    <label for="login-password" class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">Password</label>
+                    <input class="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors duration-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-black dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300" id="login-password" type="password" placeholder="******************" required>
+                </div>
+                <button class="w-full font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline shadow-md hover:shadow-lg transition-all duration-300 bg-red-600 hover:bg-red-700 text-white dark:bg-red-500 dark:hover:bg-red-600" type="submit">Sign In</button>
+            </form>
+
+            <!-- Signup Form -->
+            <form id="signup-form" class="hidden">
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="signup-firstname" class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">First Name</label>
+                        <input class="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors duration-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-black dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300" id="signup-firstname" type="text" placeholder="Alex" required>
+                    </div>
+                    <div>
+                        <label for="signup-lastname" class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">Last Name</label>
+                        <input class="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors duration-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-black dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300" id="signup-lastname" type="text" placeholder="Doe" required>
                     </div>
                 </div>
-
-                <div id="auth-error" class="text-red-500 text-sm hidden"></div>
-
-                <div class="flex flex-col space-y-4">
-                    <button type="submit" id="login-button"
-                        class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Sign In
-                    </button>
-                    <button type="button" id="signup-button"
-                        class="w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Sign Up
-                    </button>
+                <div class="mb-4">
+                    <label for="signup-email" class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">Email</label>
+                    <input class="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors duration-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-black dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300" id="signup-email" type="email" placeholder="you@example.com" required>
                 </div>
+                <div class="mb-4">
+                    <label for="signup-password" class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">Password</label>
+                    <input class="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors duration-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-black dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300" id="signup-password" type="password" placeholder="6+ characters" required>
+                </div>
+                 <div class="mb-6">
+                    <label for="signup-avatar-seed" class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">Avatar Seed</label>
+                    <div class="flex items-center gap-4">
+                        <input class="flex-grow px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors duration-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-black dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300" id="signup-avatar-seed" type="text" placeholder="Your name or a fun word">
+                        <img id="avatar-preview" src="https://api.dicebear.com/7.x/avataaars/svg?seed=" alt="Avatar Preview" class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700">
+                    </div>
+                </div>
+                <button class="w-full font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline shadow-md hover:shadow-lg transition-all duration-300 bg-red-600 hover:bg-red-700 text-white dark:bg-red-500 dark:hover:bg-red-600" type="submit">Create Account</button>
             </form>
-        </div>
-
-        <!-- Loading Spinner -->
-        <div id="loading" class="hidden text-center">
-            <svg class="animate-spin h-8 w-8 text-indigo-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <p class="mt-2 text-gray-600">Loading...</p>
         </div>
     </div>
 
-    <script src="js/auth.js"></script>
-    <script>
-        // Redirect to dashboard if already logged in
-        checkUserSession();
+    <script src="js/theme.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module">
+        import { supabase } from './js/supabaseClient.js';
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+            window.location.href = 'dashboard.html';
+        }
     </script>
 </body>
 </html>
